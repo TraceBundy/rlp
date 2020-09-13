@@ -15,6 +15,7 @@ use crate::error::DecoderError;
 use crate::rlpin::Rlp;
 use crate::stream::RlpStream;
 use crate::traits::{Decodable, Encodable};
+use std::cmp::Ordering;
 
 pub fn decode_usize(bytes: &[u8]) -> Result<usize, DecoderError> {
 	match bytes.len() {
@@ -297,9 +298,9 @@ macro_rules! impl_array_rlp {
 		impl Decodable for [u8;$size] {
 			fn decode(rlp: &Rlp) -> Result<Self, DecoderError> {
 				rlp.decoder().decode_value(|bytes| match bytes.len().cmp(&$size) {
-					std::cmp::Ordering::Less => Err(DecoderError::RlpIsTooShort),
-					std::cmp::Ordering::Greater => Err(DecoderError::RlpIsTooBig),
-					std::cmp::Ordering::Equal => {
+					Ordering::Less => Err(DecoderError::RlpIsTooShort),
+					Ordering::Greater => Err(DecoderError::RlpIsTooBig),
+					Ordering::Equal => {
 						let mut t = [0u8; $size];
 						t.copy_from_slice(bytes);
 						Ok(t)
