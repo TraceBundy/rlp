@@ -15,7 +15,7 @@ use crate::error::DecoderError;
 use crate::rlpin::Rlp;
 use crate::stream::RlpStream;
 use crate::traits::{Decodable, Encodable};
-use std::cmp::Ordering;
+pub use std::cmp::Ordering;
 
 pub fn decode_usize(bytes: &[u8]) -> Result<usize, DecoderError> {
 	match bytes.len() {
