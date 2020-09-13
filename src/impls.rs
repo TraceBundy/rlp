@@ -282,3 +282,37 @@ impl_encodable_for_f!(f32, u32);
 impl_decodable_for_f!(f32, u32);
 impl_encodable_for_f!(f64, u64);
 impl_decodable_for_f!(f64, u64);
+
+
+
+#[macro_export]
+macro_rules! impl_array_rlp {
+	($size: expr) => {
+		impl Encodable for [u8;$size] {
+			fn rlp_append(&self, s: &mut RlpStream) {
+				s.encoder().encode_value(self.as_ref());
+			}
+		}
+
+		impl Decodable for [u8;$size] {
+			fn decode(rlp: &Rlp) -> Result<Self, DecoderError> {
+				rlp.decoder().decode_value(|bytes| match bytes.len().cmp(&$size) {
+					std::cmp::Ordering::Less => Err(DecoderError::RlpIsTooShort),
+					std::cmp::Ordering::Greater => Err(DecoderError::RlpIsTooBig),
+					std::cmp::Ordering::Equal => {
+						let mut t = [0u8; $size];
+						t.copy_from_slice(bytes);
+						Ok(t)
+					}
+				})
+			}
+		}
+	};
+}
+
+impl_array_rlp!(4);
+impl_array_rlp!(8);
+impl_array_rlp!(16);
+impl_array_rlp!(32);
+impl_array_rlp!(64);
+impl_array_rlp!(128);
